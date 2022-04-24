@@ -1,8 +1,7 @@
 <template>
     <div class="panel bar">
         <h2>
-            柱状图-就业行业 <a href="#">2019</a>
-            <a href="#"> 2020</a>
+            昨日本土新增省市TOP10
         </h2>
         <div class="chart"></div>
         <div class="panel-footer"></div>
@@ -10,11 +9,17 @@
 </template>
 
 <script>
-    import $ from 'jquery'
+    import axios from 'axios'
     export default {
         name: "PanelBar",
+        data(){
+            return {
+                topCityName:'',
+                topCityData:'',
+            }
+        },
         methods:{
-            myChartBar() {
+            myChartBar(topCityName,topCityData) {
                 // 实例化对象
                 const myChart = this.$echart.init(document.querySelector(".bar .chart"));
                 // 指定配置和数据
@@ -24,7 +29,7 @@
                         trigger: "axis",
                         axisPointer: {
                             // 坐标轴指示器，坐标轴触发有效
-                            type: "shadow" // 默认为直线，可选为：'line' | 'shadow'
+                            type: "shadow"
                         }
                     },
                     grid: {
@@ -37,15 +42,8 @@
                     xAxis: [
                         {
                             type: "category",
-                            data: [
-                                "旅游行业",
-                                "教育培训",
-                                "游戏行业",
-                                "医疗行业",
-                                "电商行业",
-                                "社交行业",
-                                "金融行业"
-                            ],
+                            //data: ["上海","云南","福建","广西","北京"],
+                            data:topCityName,
                             axisTick: {
                                 alignWithLabel: true
                             },
@@ -85,10 +83,11 @@
                     ],
                     series: [
                         {
-                            name: "直接访问",
+                            name: "现有确诊",
                             type: "bar",
                             barWidth: "35%",
-                            data: [200, 300, 300, 900, 1500, 1200, 600],
+                            //data: [4579,1485,950,940,703],
+                            data: topCityData,
                             itemStyle: {
                                 barBorderRadius: 5
                             }
@@ -101,20 +100,21 @@
                 window.addEventListener("resize", function() {
                     myChart.resize();
                 });
-                // 数据变化
-                let dataAll = [
-                    { year: "2019", data: [200, 300, 300, 900, 1500, 1200, 600] },
-                    { year: "2020", data: [300, 400, 350, 800, 1800, 1400, 700] }
-                ];
-
-                $(".bar h2 ").on("click", "a", function() {
-                    option.series[0].data = dataAll[$(this).index()].data;
-                    myChart.setOption(option);
-                });
             }
         },
         mounted() {
-            this.myChartBar()
+            axios
+                .get('/api/top/')
+                .then(response => {
+                    this.topCityName = response.data.topCityName
+                    this.topCityData = response.data.topCityData
+                    this.myChartBar(this.topCityName,this.topCityData)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+
+
         }
     }
 </script>
