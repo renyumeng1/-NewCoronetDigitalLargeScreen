@@ -1,87 +1,98 @@
 <template>
     <div class="panel pie">
-        <h2>四川各城市确诊占比</h2>
+        <h2>{{ provinceName }}各城市（区）确诊占比</h2>
         <div class="chart"></div>
         <div class="panel-footer"></div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios'
+import axios from 'axios'
 
-    export default {
-        name: "PanelPie",
-        data(){
-            return {
-                sichuanCityName:'',
-                sichuanCityData:''
-            }
-        },
-        methods: {
-            myChartPie(sichuanCityData,sichuanCityName) {
-                const myChart = this.$echart.init(document.querySelector(".pie .chart"))
-
-                let option = {
-                    tooltip: {
-                        trigger: "item",
-                        formatter: "{a} <br/>{b}: {c} ({d}%)",
-                        position: function (p) {
-                            //其中p为当前鼠标的位置
-                            return [p[0] + 10, p[1] - 10];
-                        }
-                    },
-                    legend: {
-                        top: "90%",
-                        itemWidth: 10,
-                        itemHeight: 10,
-                        data: sichuanCityName,
-                        textStyle: {
-                            color: "rgba(255,255,255,.5)",
-                            fontSize: "12"
-                        }
-                    },
-                    series: [
-                        {
-                            name: "确诊人数",
-                            type: "pie",
-                            center: ["50%", "42%"],
-                            radius: ["40%", "60%"],
-                            // color: [
-                            //     "#8c3949",
-                            //     "#1ad5a5",
-                            //     "#0682ab",
-                            //     "#0696ab",
-                            //     "#06a0ab",
-                            //     "#06b4ab",
-                            //     "#06c8ab",
-                            //     "#06dcab",
-                            //     "#06f0ab"
-                            // ],
-                            label: {show: false},
-                            labelLine: {show: false},
-                            data: sichuanCityData
-                        }
-                    ]
-                }
-
-                // 使用刚指定的配置项和数据显示图表。
-                myChart.setOption(option)
-                window.addEventListener("resize", function () {
-                    myChart.resize()
-                })
-            }
-        },
-        mounted() {
-            axios
-                .get('/api/right/pie/')
-                .then(response => {
-                    this.sichuanCityData = response.data.sichuanCityData
-                    this.sichuanCityName = response.data.sichuanCityName
-                    this.myChartPie(this.sichuanCityData,this.sichuanCityName)
-                })
-
+export default {
+    name: "PanelPie",
+    data() {
+        return {
+            CityName: '',
+            CityData: '',
+            provinceName: '四川'
         }
-    }
+    },
+    methods: {
+        myChartPie(CityData, CityName) {
+            const myChart = this.$echart.init(document.querySelector(".pie .chart"))
+            let option = {
+                tooltip: {
+                    trigger: "item",
+                    formatter: "{a} <br/>{b}: {c} ({d}%)",
+                    position: function (p) {
+                        //其中p为当前鼠标的位置
+                        return [p[0] + 10, p[1] - 10];
+                    }
+                },
+                legend: {
+                    top: "90%",
+                    itemWidth: 10,
+                    itemHeight: 10,
+                    data: CityName,
+                    textStyle: {
+                        color: "rgba(255,255,255,.5)",
+                        fontSize: "12"
+                    }
+                },
+                series: [
+                    {
+                        name: "确诊人数",
+                        type: "pie",
+                        center: ["50%", "42%"],
+                        radius: ["40%", "60%"],
+                        label: {show: true},
+                        labelLine: {show: true},
+                        data: CityData
+                    }
+                ]
+            }
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option)
+            window.addEventListener("resize", function () {
+                myChart.resize()
+            })
+        },
+        getProvince(provinceName) {
+            this.provinceName = provinceName
+        }
+    },
+    mounted() {
+        axios
+            .get('/api/right/pie/')
+            .then(response => {
+                this.CityData = response.data.sichuanCityData
+                this.CityName = response.data.sichuanCityName
+                this.myChartPie(this.CityData, this.CityName)
+            })
+        this.$bus.$on('sendProvinceName', this.getProvince)
+
+    },
+    watch: {
+        provinceName(data) {
+            axios
+                .post('/api/right/pie/change/', JSON.stringify({
+                    provinceName: data
+                }))
+                .then(response => {
+                        this.CityData = response.data.newData
+                        this.CityName = response.data.provinceName
+                        this.$echart.init(document.querySelector(".pie .chart")).dispose()
+                        this.myChartPie(this.CityData, this.CityName)
+                    }
+                )
+                .catch(error => {
+                    console.log(error.message)
+                })
+        }
+    },
+}
 </script>
 
 <style scoped>
