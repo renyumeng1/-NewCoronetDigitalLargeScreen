@@ -147,8 +147,6 @@ export default {
                     this.deads = response.data.deads
                     this.heals = response.data.heals
                     this.storeConfirms = response.data.storeConfirms
-                    console.log(this.confirms)
-                    console.log(this.heals)
                     this.myChartLine(this.storeConfirms, this.confirms, this.deads, this.heals, this.dates)
                 })
                 .catch(error => {

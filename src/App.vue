@@ -1,9 +1,12 @@
 <template>
-  <div>
-    <Header/>
-    <AllCharts/>
+    <div>
+        <dv-full-screen-container>
+            <dv-loading v-if="showLoading">Loading...</dv-loading>
+            <Header/>
+            <AllCharts/>
+        </dv-full-screen-container>
 
-  </div>
+    </div>
 
 </template>
 
@@ -11,29 +14,46 @@
 
 import Header from "@/components/Header";
 import AllCharts from "@/components/AllCharts";
+
 export default {
-  name: 'App',
-  components: {
-    AllCharts,
-    Header,
-  }
+    name: 'App',
+    components: {
+        AllCharts,
+        Header,
+    },
+    data() {
+        return {
+            showLoading: true,
+        }
+    },
+    methods:{
+        getBarTemp(BarTemp){
+            this.showLoading = BarTemp
+        }
+    },
+    mounted() {
+        this.$bus.$on('getBarTemp',this.getBarTemp)
+    }
 }
 </script>
 
 <style>
-  * {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-  li {
+}
+
+li {
     list-style: none;
-  }
-  @font-face {
+}
+
+@font-face {
     font-family: electronicFont;
     src: url(./assets/font/DS-DIGIT.TTF);
-  }
-  body {
+}
+
+body {
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 0;
@@ -42,18 +62,19 @@ export default {
     background-size: cover;
     /* 行高是字体1.15倍 */
     line-height: 1.15;
-  }
+}
 
 
-  .panel {
+.panel {
     position: relative;
     height: 3.875rem;
     border: 1px solid rgba(25, 186, 139, 0.17);
     background: rgba(255, 255, 255, 0.04) url(assets/images/line1.png);
     padding: 0 0.1875rem 0.5rem;
     margin-bottom: 0.1875rem;
-  }
-  .panel::before {
+}
+
+.panel::before {
     position: absolute;
     top: 0;
     left: 0;
@@ -62,8 +83,9 @@ export default {
     height: 10px;
     border-top: 2px solid #02a6b5;
     border-left: 2px solid #02a6b5;
-  }
-  .panel::after {
+}
+
+.panel::after {
     position: absolute;
     top: 0;
     right: 0;
@@ -72,14 +94,16 @@ export default {
     height: 10px;
     border-top: 2px solid #02a6b5;
     border-right: 2px solid #02a6b5;
-  }
-  .panel .panel-footer {
+}
+
+.panel .panel-footer {
     position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
-  }
-  .panel .panel-footer::before {
+}
+
+.panel .panel-footer::before {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -88,8 +112,9 @@ export default {
     height: 10px;
     border-bottom: 2px solid #02a6b5;
     border-left: 2px solid #02a6b5;
-  }
-  .panel .panel-footer::after {
+}
+
+.panel .panel-footer::after {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -98,39 +123,44 @@ export default {
     height: 10px;
     border-bottom: 2px solid #02a6b5;
     border-right: 2px solid #02a6b5;
-  }
-  .panel h2 {
+}
+
+.panel h2 {
     height: 0.6rem;
     line-height: 0.6rem;
     text-align: center;
     color: #fff;
     font-size: 0.25rem;
     font-weight: 400;
-  }
-  .panel h2 a {
+}
+
+.panel h2 a {
     margin: 0 0.1875rem;
     color: #fff;
     text-decoration: underline;
-  }
-  .panel .chart {
-    height: 3rem;
-  }
+}
 
-  .map {
+.panel .chart {
+    height: 3rem;
+}
+
+.map {
     position: relative;
     height: 10.125rem;
-  }
-  .map .chart {
+}
+
+.map .chart {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 5;
     height: 10.125rem;
     width: 100%;
-  }
-  .map .map1,
-  .map .map2,
-  .map .map3 {
+}
+
+.map .map1,
+.map .map2,
+.map .map3 {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -140,46 +170,52 @@ export default {
     background: url(assets/images/map.png) no-repeat;
     background-size: 100% 100%;
     opacity: 0.3;
-  }
-  .map .map2 {
+}
+
+.map .map2 {
     width: 8.0375rem;
     height: 8.0375rem;
     background-image: url(assets/images/lbx.png);
     opacity: 0.6;
     animation: rotate 15s linear infinite;
     z-index: 2;
-  }
-  .map .map3 {
+}
+
+.map .map3 {
     width: 7.075rem;
     height: 7.075rem;
     background-image: url(assets/images/jt.png);
     animation: rotate1 10s linear infinite;
-  }
-  @keyframes rotate {
+}
+
+@keyframes rotate {
     from {
-      transform: translate(-50%, -50%) rotate(0deg);
+        transform: translate(-50%, -50%) rotate(0deg);
     }
     to {
-      transform: translate(-50%, -50%) rotate(360deg);
+        transform: translate(-50%, -50%) rotate(360deg);
     }
-  }
-  @keyframes rotate1 {
+}
+
+@keyframes rotate1 {
     from {
-      transform: translate(-50%, -50%) rotate(0deg);
+        transform: translate(-50%, -50%) rotate(0deg);
     }
     to {
-      transform: translate(-50%, -50%) rotate(-360deg);
+        transform: translate(-50%, -50%) rotate(-360deg);
     }
-  }
-  @media screen and (max-width: 1024px) {
+}
+
+@media screen and (max-width: 1024px) {
     html {
-      font-size: 42px !important;
+        font-size: 42px !important;
     }
-  }
-  @media screen and (min-width: 1920) {
+}
+
+@media screen and (min-width: 1920) {
     html {
-      font-size: 80px !important;
+        font-size: 80px !important;
     }
-  }
+}
 
 </style>

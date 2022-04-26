@@ -2,19 +2,21 @@
     <div class="column">
         <PanelBar/>
         <PanelLine/>
-        <PanelPie/>
+        <Shuffling/>
     </div>
 </template>
 
 <script>
-    import PanelBar from "@/components/LeftPanel/PanelBar";
-    import PanelLine from "@/components/LeftPanel/PanelLine";
-    import PanelPie from "@/components/LeftPanel/PanelPie";
-    export default {
-        name: "Left",
-        components: {PanelPie, PanelLine, PanelBar},
+import PanelBar from "@/components/LeftPanel/PanelBar";
+import PanelLine from "@/components/LeftPanel/PanelLine";
+import Shuffling from '@/components/LeftPanel/Shuffling'
 
-    }
+export default {
+    name: "Left",
+    components: {Shuffling, PanelLine, PanelBar},
+
+
+}
 </script>
 
 <style scoped>
