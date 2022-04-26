@@ -37,9 +37,9 @@ export default {
         return {
             gnTotal: '',
             deathTotal: '',
-            theTime:'',
-            addConNew:'',
-            addDeathNew:''
+            theTime: '',
+            addConNew: '',
+            addDeathNew: '',
         }
     },
     methods: {
@@ -57,7 +57,7 @@ export default {
                 })
                 .catch(error => console.log(error.message))
         },
-        getTime(){
+        getTime() {
             axios
                 .get("/api/total/")
                 .then(response => {
@@ -77,7 +77,7 @@ export default {
     mounted() {
         this.getTotalData()
         //定时器1小时请求一次time
-        this.timerGetTime = setInterval(this.getTime,3600000)
+        this.timerGetTime = setInterval(this.getTime, 3600000)
     },
     beforeDestroy() {
         clearInterval(this.timerGetTime)
