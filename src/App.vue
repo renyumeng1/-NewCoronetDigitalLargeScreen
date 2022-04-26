@@ -144,49 +144,7 @@ body {
     height: 3rem;
 }
 
-.map {
-    position: relative;
-    height: 10.125rem;
-}
 
-.map .chart {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 5;
-    height: 10.125rem;
-    width: 100%;
-}
-
-.map .map1,
-.map .map2,
-.map .map3 {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 6.475rem;
-    height: 6.475rem;
-    background: url(assets/images/map.png) no-repeat;
-    background-size: 100% 100%;
-    opacity: 0.3;
-}
-
-.map .map2 {
-    width: 8.0375rem;
-    height: 8.0375rem;
-    background-image: url(assets/images/lbx.png);
-    opacity: 0.6;
-    animation: rotate 15s linear infinite;
-    z-index: 2;
-}
-
-.map .map3 {
-    width: 7.075rem;
-    height: 7.075rem;
-    background-image: url(assets/images/jt.png);
-    animation: rotate1 10s linear infinite;
-}
 
 @keyframes rotate {
     from {

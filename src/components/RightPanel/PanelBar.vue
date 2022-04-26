@@ -1,6 +1,6 @@
 <template>
     <div class="panel bar1">
-        <h2>柱状图-技能掌握</h2>
+        <h2>test</h2>
         <div class="chart"></div>
         <div class="panel-footer"></div>
     </div>
@@ -14,7 +14,7 @@
                 const myChart = this.$echart.init(document.querySelector(".bar1 .chart"));
 
                 let data = [70, 34, 60, 78, 69];
-                let titleName = ["HTML5", "CSS3", "javascript", "VUE", "NODE"];
+                let titleName = ["test1", "test2", "test3", "test4", "test5"];
                 let valData = [702, 350, 610, 793, 664];
                 const myColor = ["#1089E7", "#F57474", "#56D0E3", "#F8B448", "#8B78F6"];
                 let option = {

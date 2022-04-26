@@ -120,7 +120,6 @@ export default {
     },
     watch: {
         tempBar() {
-            console.log(1)
             this.timer = setTimeout(() => {
                 this.$bus.$emit('getBarTemp', this.tempBar)
             }, 2048)

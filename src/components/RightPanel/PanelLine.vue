@@ -1,6 +1,6 @@
 <template>
     <div class="panel line1">
-        <h2>折线图-播放量</h2>
+        <h2>test</h2>
         <div class="chart"></div>
         <div class="panel-footer"></div>
     </div>
@@ -118,7 +118,7 @@
                     ],
                     series: [
                         {
-                            name: "播放量",
+                            name: "testName1",
                             type: "line",
                             smooth: true,
                             symbol: "circle",
@@ -193,7 +193,7 @@
                             ]
                         },
                         {
-                            name: "转发量",
+                            name: "testName2",
                             type: "line",
                             smooth: true,
                             symbol: "circle",
