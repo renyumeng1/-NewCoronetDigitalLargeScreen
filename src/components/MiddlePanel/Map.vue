@@ -64,17 +64,17 @@ export default {
                         {min: 200, max: 310},
                         {min: 0, max: 200}],
 
-                    align: "right", //控制分段标准的文字显示在图片左边还是右边
-                    left: 0, //控制自定义分段距离盒子左边的距离
-                    top: 550,//控制自定义分段距离盒子顶部的距离
+                    align: "right",
+                    left: 0,
+                    top: 550,
                     inRange: {
-                        symbol: "circle", //控制分段图片显示为一个圆圈
-                        color: ["#ffc0b1", "#9c0505"] //控制红色到蓝色
+                        symbol: "circle",
+                        color: ["#ffc0b1", "#9c0505"]
                     }
                 }],
-                tooltip: { //控制鼠标hover上去显示信息
+                tooltip: {
                     trigger: "item",
-                    formatter: function (params) { //自定义悬浮窗的显示内容
+                    formatter: function (params) {
                         return params.name + "<br/>" + params.seriesName + "：" + params.value
                     }
                 },

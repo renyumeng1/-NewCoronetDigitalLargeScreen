@@ -215,8 +215,10 @@ def middle_map_panel():
 
 
 def filter_data(provinceName):
+    global city_all
     for i in range(len(data_xinlang_province)):
         if data_xinlang_province[i]['name'] == provinceName:
+            city_all = int(data_xinlang_province[i]['value'])
             city_data = data_xinlang_province[i]['city']
             return city_data
 
@@ -230,13 +232,13 @@ def get_shuffling_data(cityData):
                             cityData[i]['cureNum'], cityData[i]['deathNum']]
         else:
             lst_instance = [cityData[i]['mapName'], cityData[i]['conNum'],
-                        cityData[i]['cureNum'], cityData[i]['deathNum']]  # 内部数据[name,all,death,cure]
+                            cityData[i]['cureNum'], cityData[i]['deathNum']]  # 内部数据[name,all,death,cure]
         shuffling_data.append(lst_instance)
     return shuffling_data
 
 
 @app.route('/api/left/shuffling/change/', methods=['POST'])
-def change_shuffling():
+def change_right_shuffling():
     provinceName = request.get_data()
     provinceName = json.loads(provinceName)
     provinceName = provinceName['provinceName']
@@ -245,6 +247,37 @@ def change_shuffling():
     data_total = {
         "provinceName": provinceName,
         "newData": city_value
+    }
+    return jsonify(data_total)
+
+
+def get_pie_data(cityData):
+    city_name_all = []  # 四川城市名称
+    city_data_all = []  # 城市所对应数据
+    for i in range(len(cityData)):
+        city_name = cityData[i]['name']
+        city_data = int(cityData[i]['conNum'])
+        if city_data / city_all <= 0.01:
+            continue
+        city_name_all.append(city_name)
+        temp = {
+            "value": city_data,
+            "name": city_name
+        }
+        city_data_all.append(temp)
+    return city_data_all
+
+
+@app.route('/api/right/pie/change/', methods=['POST'])
+def change_right_pie():
+    provinceName = request.get_data()
+    provinceName = json.loads(provinceName)
+    provinceName = provinceName['provinceName']
+    city_data = filter_data(provinceName)
+    new_data = get_pie_data(city_data)
+    data_total = {
+        "provinceName": provinceName,
+        "newData": new_data
     }
     return jsonify(data_total)
 

@@ -147,6 +147,13 @@ export default {
                     this.deads = response.data.deads
                     this.heals = response.data.heals
                     this.storeConfirms = response.data.storeConfirms
+                    // 传递数据到rightPanelLine组件
+                    let dataAll = {
+                        confirms: this.confirms,
+                        deads: this.deads,
+                        time:this.dates
+                    }
+                    this.$bus.$emit('sendDataToRightLine', dataAll)
                     this.myChartLine(this.storeConfirms, this.confirms, this.deads, this.heals, this.dates)
                 })
                 .catch(error => {
@@ -156,6 +163,7 @@ export default {
     },
     mounted() {
         this.getAllData()
+
     }
 }
 </script>
