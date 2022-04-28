@@ -52,6 +52,7 @@ export default {
                         zoom: 1.2, //控制整个地图的缩放倍数
                         data: mapData //TODO 每个板块的数据TODO
                     }
+
                 ],
                 visualMap: [{
                     type: "piecewise", //左下角的分段显示
