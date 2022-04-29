@@ -9,6 +9,7 @@ Vue.config.productionTip = false
 Vue.prototype.$echart = eCharts
 
 
+
 new Vue({
     render: h => h(App),
     beforeCreate() {
