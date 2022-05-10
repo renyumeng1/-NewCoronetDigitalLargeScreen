@@ -105,7 +105,7 @@ export default {
 </script>
 ```
 
-所以Time组件为Header组件的<font color='red'>子组件</font>，我们要**做到时间实时刷新，并且要与现在的时间同步**，那么可以使用`Date.parse(new Date())`获取当前时间戳，并且通过dayjs这个第三方库将时间转换成`YYYY年MM月DD日 hh:mm:ss`，然后在`mounted`这个生命周期钩子里面开启定时器，并在`beforeDestroy`这个生命周期钩子里面摧毁定时器，此时Time的结构为（<font color='red'>css部分忽略</font>）：
+Time组件为Header组件的<font color='red'>子组件</font>，我们要**做到时间实时刷新，并且要与现在的时间同步**，那么可以使用`Date.parse(new Date())`获取当前时间戳，并且通过dayjs这个第三方库将时间转换成`YYYY年MM月DD日 hh:mm:ss`，然后在`mounted`这个生命周期钩子里面开启定时器，并在`beforeDestroy`这个生命周期钩子里面摧毁定时器，此时Time的结构为（<font color='red'>css部分忽略</font>）：
 
 ```vue
 //Time.vue
@@ -178,7 +178,7 @@ export default {
 
 ##### 5.2.1 准备工作
 
-1. 可视化部分：用到了echarts，但要在Vue中全局使用echarts需要在`main,js`文件中引用echarts并且在Vue的`protptype`属性中新增`$echart`为echarts即`Vue.prototype.$echart = echarts`
+1. 可视化部分：用到了echarts，但要在Vue中全局使用echarts需要在`main.js`文件中引用echarts并且在Vue的`protptype`属性中挂载一个全局变量`$echart`为echarts即`Vue.prototype.$echart = echarts`，这样所有组件都能使用`this.$echart`访问到echarts
 2. 全局事件总线：在Vue中不使用Vuex实现组件间通信是一件很麻烦的事，但是在一个小项目中，又没有必要使用Vuex，所以，我们可以找一个中间量，存储需要传递的数据。在Vue的虚拟dom中，每一个组件都是一个新的VueComponent对象，而每一个VueComponent对象的原型对象的属性，都指向了VueModel原型对象，所以我们可以在Vue的原型对象上绑定一个`$bus`属性指向了Vue本身，那么，这个中间变量就实现了。即在`main.js`中，在Vue的beforeCreate这个生命周期钩子中`Vue.prototype.$bus = this`
 ```vue
    new Vue({
