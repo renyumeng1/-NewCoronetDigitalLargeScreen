@@ -123,7 +123,7 @@ def getAllData():
     for i in range(len(data_sichuan_city)):
         city_name = data_sichuan_city[i]['name']
         city_data = int(data_sichuan_city[i]['conNum'])
-        if city_data / sichuan_all <= 0.01:
+        if city_data / sichuan_all <= 0.05:
             continue
         sichuan_city_name.append(city_name)
         temp = {
@@ -257,7 +257,7 @@ def get_pie_data(cityData):
     for i in range(len(cityData)):
         city_name = cityData[i]['name']
         city_data = int(cityData[i]['conNum'])
-        if city_data / city_all <= 0.01:
+        if city_data / city_all <= 0.05:
             continue
         city_name_all.append(city_name)
         temp = {

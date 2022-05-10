@@ -125,7 +125,13 @@ export default {
             }, 2048)
 
         }
-    }
+    },
+    beforeDestroy() {
+            //销毁定时器
+            if (this.timer){
+                clearInterval(this.timer)
+            }
+        }
 }
 </script>
 
