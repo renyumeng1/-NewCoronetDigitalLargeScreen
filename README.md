@@ -487,7 +487,7 @@ export default {
 </style>
 ```
 
-这个组件还有个部分，在打开这个可视化大屏的时候，如果数据还没有请求回来，页面就会显示Loading。我在`watch`里配置了一个`tempBar`（boolean），监测数据的请求情况，如果请求回了数据，`tempBar`就会被修改为`false`，当`tempBar`的值改变了之后，就会触发`watch`里的`tempBar`函数，那么就会延时2秒向`App.Vue`传递`tempBar`，此时Vue的一个指令,`v-if`就派上用场了，他可以显示（隐藏）一个DOM节点，`app.vue`组件代码如下：
+这个组件还有个部分，在打开这个可视化大屏时，如果数据还没有请求回来，页面就会显示Loading。我在`watch`里配置了一个`tempBar`（boolean），监测数据的请求情况，如果请求回了数据，`tempBar`就会被修改为`false`，当`tempBar`的值改变了之后，就会触发`watch`里的`tempBar`函数，那么就会延时2秒向`App.Vue`传递`tempBar`，此时Vue的一个指令,`v-if`就派上用场了，他可以显示（隐藏）一个DOM节点，`app.vue`组件代码如下：
 
 ```vue
 <template>
