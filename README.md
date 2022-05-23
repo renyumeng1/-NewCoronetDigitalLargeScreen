@@ -262,7 +262,7 @@ export default {
 </script>
 ```
 
-###### 5.2.1.1 `PannelBar.vue`
+###### 5.2.2.1 `PannelBar.vue`
 
 这个组件展示的是关于中国疫情最多的10个城市，现在，开始设计后端的api。通过翻看echarts的文档，我们可以查到，在echarts中，柱状图的数据，需要传入两个array类型的data，所以在设计后端api时，需要返回的数据为如下格式：
 
@@ -530,5 +530,318 @@ export default {
 </script>
 ```
 
-###### 5.2.1.2 PannelLine.vue
+###### 5.2.2.2 `PannelLine.vue`
+
+`PannelLine`的前端部分的设计思路和`PannelBar`差不多，不同就是封装的数据类型不一样，`PannelLine`需要的是如下数据：
+
+```javascript
+data() {
+        return {
+            confirms: '',
+            dates: '',
+            deads: '',
+            heals: '',
+            storeConfirms: '',
+        }
+    }
+```
+
+分别是无症状人数，治愈人数，日期，死亡人数和确诊人数。通过`axios`异步往后端的`'/api/left/line/'`请求回需要的设计，这部分组件就完成了。
+
+###### 5.2.2.3 `Shuffling.vue`
+
+这个组件展示的是全国各省各市疫情的情况，但默认他是展示一个省的所有市的，所以，他和中间疫情分布图部分做了交互，即，点击了地图上某一个省，就展示某个省所有市的情况。
+
+在这个组件中，用到了`dataV`的`dv-scroll-board`组件，这个组件为我们封装好展示轮播表的所有代码，我们只用使用`Vue`的`prop`属性往组件里传参就行了。代码如下
+
+```vue
+<div>
+        <div class="panel">
+            <h2>{{ provinceName }}省各市疫情累计情况</h2>
+            <dv-scroll-board
+                :config="config"
+                style="height: 100%;width: 100%"
+            />
+        </div>
+```
+
+`config`是传入的配置对象，包含展示的数据和对轮播表的调整，具体参数可以去官方文档查阅。与`Map`组件的交互部分的设计思路如下：
+
+当`Map`组件监测到用户点击了地图上的某一个省份时，`Map`组件就会把点击的省份的`provinceName`传递给`Shuffling`组件，同样`Shuffling`也监测着`provinceName`的变化，当接收到`Map`组件的数据时，意味着`Shuffling`组件的`provinceName`发生了变化，这个时候，再把这个`provinceName`发送给后端，而后端接收到请求之后，检索这个`provinceName`然后再将包含这个`provinceName`的所有字段的数据封装成`JSON`再传回给前端。
+
+前端部分代码如下：
+
+```javascript
+	methods: {
+        getAlldata() {
+            axios
+                .get('/api/right/shuffling/')
+                .then(response => {
+                    this.config = {
+                        data: response.data.PanelShufflingData,
+                        waitTime: 1500,
+                        header: ['城市名', '确诊', '治愈', '死亡'],
+                        //headerBGC: "FFFFFF0A",
+                        oddRowBGC: "FFFFFF0A",
+                    }
+                })
+        },
+        getProvince(provinceName) {
+            this.provinceName = provinceName
+        }
+    },
+    mounted() {
+        this.getAlldata()
+        this.$bus.$on('sendProvinceName', this.getProvince)
+    },
+    watch: {
+        provinceName(data) {
+            axios
+                .post('/api/left/shuffling/change/', JSON.stringify({
+                    provinceName: data
+                }))
+                .then(response => {
+                    this.config = {
+                        data: response.data.newData,
+                        waitTime: 1500,
+                        header: ['城市名', '确诊', '治愈', '死亡'],
+                        oddRowBGC: "FFFFFF0A",
+                    }
+                })
+                .catch(error => {
+                    console.log(error.message)
+                })
+        }
+    },
+    beforeDestroy() {
+        this.$bus.$off('sendProvinceName')
+    }
+```
+
+后端部分代码如下：
+
+```python
+@app.route('/api/left/shuffling/change/', methods=['POST'])
+def change_right_shuffling():
+    provinceName = request.get_data()
+    provinceName = json.loads(provinceName)
+    provinceName = provinceName['provinceName']
+    city_data = filter_data(provinceName)
+    city_value = get_shuffling_data(city_data)
+    data_total = {
+        "provinceName": provinceName,
+        "newData": city_value
+    }
+    return jsonify(data_total)
+```
+
+##### 5.2.3 `Middle.vue`组件
+
+这个组件包含两个子组件：
+
+1. `Map.vue`组件
+2. `Total.vue`组件
+
+###### 5.2.3.1 `Map.vue`
+
+这个组件是在地图上展示中国疫情的分布图，同时也和轮播表，饼状图做了交互，部分代码如下：
+
+```vue
+<template>
+    <div class="map">
+        <div class="chart"></div>
+        <div class="map1"></div>
+        <div class="map2"></div>
+        <div class="map3"></div>
+    </div>
+</template>
+
+<script>
+import '../../assets/js/china'
+import axios from 'axios'
+
+export default {
+    name: "Map",
+    data(){
+        return {
+            mapData:'',
+            provinceName:''
+        }
+    },
+    methods: {
+        myChartMap(mapData) {
+            // 1. 实例化对象
+            const myChart = this.$echart.init(document.querySelector(".map .chart"));
+            let option = {
+                title: {
+                    text: "中国疫情分布图（累计）",
+                    left: 250, //设置标题的距离盒子左边的距离
+                    top: 100, //设置标题距离盒子顶部的距离
+                    color:'#a61919'
+                },
+
+                series: [
+                    {
+                        name: "确诊人数", //控制鼠标hover上去显示的固定文本
+                        type: "map", //告诉echarts需要渲染一个地图
+                        mapType: "china", //告诉echarts要渲染注册的china地图
+                        label: {
+                            show: true, //控制是否显示省份的名称
+                            color: "white" // 设置显示每个省份的字体颜色
+                        },
+                        itemStyle: {
+                            borderColor: "green" //每个省份的边界的颜色
+                        },
+                        emphasis: { //控制鼠标移入的版块的颜色
+                            color: "#fff", //移入该模块的字体颜色
+                            itemStyle: {
+                                areaColor: "#83b5e7", //鼠标hover到模块上的背景色
+                            }
+                        },
+                        zoom: 1.2, //控制整个地图的缩放倍数
+                        data: mapData //TODO 每个板块的数据TODO
+                    }
+
+                ],
+                visualMap: [{
+                    type: "piecewise", //左下角的分段显示
+                    show: true,
+                    splitNumber: 4, //显示几个分段
+                    pieces: [ //左下角的自定义分段显示
+                        {min: 15000},
+                        {min: 900, max: 15000},
+                        {min: 310, max: 900},
+                        {min: 200, max: 310},
+                        {min: 0, max: 200}],
+
+                    align: "right",
+                    left: 0,
+                    top: 550,
+                    inRange: {
+                        symbol: "circle",
+                        color: ["#ffc0b1", "#9c0505"]
+                    }
+                }],
+                tooltip: {
+                    trigger: "item",
+                    formatter: function (params) {
+                        return params.name + "<br/>" + params.seriesName + "：" + params.value
+                    }
+                },
+            }
+            myChart.setOption(option)
+            myChart.on('click',params =>{
+                this.provinceName = params.data.name
+                this.$bus.$emit('sendProvinceName',this.provinceName)
+            })
+            window.addEventListener("resize", function () {
+                myChart.resize();
+            });
+        }
+    },
+    mounted() {
+        axios
+            .get('/api/right/map/')
+            .then(response => {
+                this.mapData = response.data.mapData
+                this.myChartMap(this.mapData)
+            })
+    }
+}
+</script>
+```
+
+###### 5.2.3.2 `Total.vue`
+
+这个组件是为了展示中国现有疫情情况，部分代码如下：
+
+```vue
+<template>
+    <div class="no">
+        <div class="no-hd">
+            <ul>
+                <li>{{ gnTotal }}</li>
+                <li style="color: red">{{ deathTotal }}</li>
+            </ul>
+        </div>
+        <div class="no-bd">
+            <ul>
+                <li>国内现有确诊</li>
+                <li>国内累计死亡</li>
+            </ul>
+        </div>
+        <div class="no-hd">
+            <ul>
+                <li>{{ addConNew }}</li>
+                <li style="color: red">{{ addDeathNew }}</li>
+            </ul>
+        </div>
+        <div class="no-bd">
+            <ul>
+                <li>至今累计新增确诊</li>
+                <li>至今累计新增死亡</li>
+            </ul>
+        </div>
+    </div>
+</template>
+
+<script>
+import axios from 'axios'
+
+export default {
+    // eslint-disable-next-line vue/multi-word-component-names
+    name: "Total",
+    data() {
+        return {
+            gnTotal: '',
+            deathTotal: '',
+            theTime: '',
+            addConNew: '',
+            addDeathNew: '',
+        }
+    },
+    methods: {
+        getTotalData() {
+            axios
+                .get("/api/total/")
+                .then(response => {
+                    this.gnTotal = response.data.gnTotal
+                    this.deathTotal = response.data.deathTotal
+                    this.addConNew = response.data.addConNew
+                    this.addDeathNew = response.data.addDeathNew
+                    let getTime = response.data.times
+                    this.theTime = getTime
+                    this.$bus.$emit("getTime", getTime)
+                })
+                .catch(error => console.log(error.message))
+        },
+        getTime() {
+            axios
+                .get("/api/total/")
+                .then(response => {
+                    this.theTime = response.data.times
+                })
+        }
+    },
+    watch: {
+        // 监测time的变化，变化了延时1分钟请求其他数据
+        theTime() {
+            clearTimeout(this.timer)
+            this.timer = setTimeout(() => {
+                this.getTotalData()
+            }, 60)
+        }
+    },
+    mounted() {
+        this.getTotalData()
+        //定时器1小时请求一次time
+        this.timerGetTime = setInterval(this.getTime, 3600000)
+    },
+    beforeDestroy() {
+        clearInterval(this.timerGetTime)
+    }
+
+}
+</script>
+```
 

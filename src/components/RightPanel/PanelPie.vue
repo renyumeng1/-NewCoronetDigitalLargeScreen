@@ -74,6 +74,8 @@ export default {
         this.$bus.$on('sendProvinceName', this.getProvince)
 
     },
+    beforeDestroy() {
+    },
     watch: {
         provinceName(data) {
             axios

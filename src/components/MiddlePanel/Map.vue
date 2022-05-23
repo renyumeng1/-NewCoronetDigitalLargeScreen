@@ -26,9 +26,9 @@ export default {
             let option = {
                 title: {
                     text: "中国疫情分布图（累计）",
-                    left: 250, //设置标题的距离盒子左边的距离
+                    left: "center", //设置标题的距离盒子左边的距离
                     top: 100, //设置标题距离盒子顶部的距离
-                    color:'#a61919'
+                    color:'#15abb9'
                 },
 
                 series: [

@@ -1,19 +1,18 @@
 <template>
     <div class="column">
-        <PanelBar/>
-        <PanelLine/>
+        <Top/>
+<!--        <PanelLine/>-->
         <PanelPie/>
 
     </div>
 </template>
 
 <script>
-    import PanelBar from "@/components/RightPanel/PanelBar";
-    import PanelLine from "@/components/RightPanel/PanelLine";
+    import Top from "@/components/RightPanel/Top";
     import PanelPie from "@/components/RightPanel/PanelPie";
     export default {
         name: "Right",
-        components: {PanelPie, PanelLine, PanelBar},
+        components: {PanelPie, Top},
     }
 </script>
 

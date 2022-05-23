@@ -26,7 +26,7 @@ export default {
     methods: {
         getAlldata() {
             axios
-                .get('/api/right/shuffling/')
+                .get('/api/left/shuffling/')
                 .then(response => {
                     this.config = {
                         data: response.data.PanelShufflingData,

@@ -11,7 +11,8 @@ module.exports = defineConfig({
                     '^/api': '/'
                 }
             }
-        }
+        },
     },
+    publicPath:'./'
 
 })

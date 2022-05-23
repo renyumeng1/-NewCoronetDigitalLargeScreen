@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_apscheduler import APScheduler
 import requests
+from flask_cors import CORS
 import json
 
 
@@ -26,6 +27,18 @@ class APSchedulerJobConfig(object):
 app = Flask(__name__)
 
 
+# 跨域支持
+def after_request(response):
+    # JS前端跨域支持
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+app.after_request(after_request)
+CORS(app, supports_credentials=True)
+
+
 def getAllData():
     global times
     global gnTotal
@@ -41,6 +54,7 @@ def getAllData():
     global dates
     global sichuan_city_name
     global sichuan_city_data
+    global sichuan_city_data_top
     global left_panel_shuffling_data
     global map_data
     global data_xinlang_province
@@ -120,10 +134,16 @@ def getAllData():
     data_sichuan_city = data_sichuan["city"]  # 四川城市数据
     sichuan_city_name = []  # 四川城市名称
     sichuan_city_data = []  # 城市所对应数据
+    sichuan_city_data_top = []  # 右边top四川数据
     for i in range(len(data_sichuan_city)):
         city_name = data_sichuan_city[i]['name']
         city_data = int(data_sichuan_city[i]['conNum'])
         if city_data / sichuan_all <= 0.05:
+            temp_top = {
+                "value": city_data,
+                "name": city_name
+            }
+            sichuan_city_data_top.append(temp_top)
             continue
         sichuan_city_name.append(city_name)
         temp = {
@@ -198,7 +218,7 @@ def left_pie_panel():
     return jsonify(data_total)
 
 
-@app.route('/api/right/shuffling/')
+@app.route('/api/left/shuffling/')
 def left_shuffling_panel():
     data_total = {
         "PanelShufflingData": left_panel_shuffling_data,
@@ -278,6 +298,45 @@ def change_right_pie():
     data_total = {
         "provinceName": provinceName,
         "newData": new_data
+    }
+    return jsonify(data_total)
+
+
+@app.route('/api/right/top/', methods=['GET'])
+def get_right_top():
+    data_total = {
+        "sichuanCityData": sichuan_city_data_top
+    }
+    return jsonify(data_total)
+
+
+def get_right_top_change_data(province_name):
+    city_data = filter_data(province_name)
+    change_data_lst = []
+    for i in range(len(city_data)):
+        if city_data[i]['mapName'] == '':
+            # change_data_lst.append({
+            #     'name': city_data[i]['name'],
+            #     'value': city_data[i]['conNum']
+            # })
+            continue
+
+        change_data_lst.append({
+            'name': city_data[i]['mapName'],
+            'value': int(city_data[i]['conNum'])
+        })
+    change_data_lst = sorted(change_data_lst, key=lambda x: int(x['value']),reverse=True)
+    return change_data_lst
+
+
+@app.route('/api/right/top/change/', methods=['POST'])
+def change_right_top():
+    provinceName = request.get_data()
+    provinceName = json.loads(provinceName)
+    provinceName = provinceName['provinceName']
+    new_province_data = get_right_top_change_data(provinceName)
+    data_total = {
+        "newProvinceData": new_province_data
     }
     return jsonify(data_total)
 
