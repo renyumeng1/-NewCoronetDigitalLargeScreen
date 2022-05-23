@@ -29,7 +29,7 @@ npm run build
 项目结构（组件部分）：
 
 ```
-G:.
+components:.
 │   AllCharts.vue
 │   Header.vue
 │   Left.vue
